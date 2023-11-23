@@ -2,10 +2,18 @@ import { todoModel } from "../models/todo.model.js";
 import { getDatabaseError } from "../lib/errors/database.error.js";
 
 const read = async (req, res) => {
-  const { limit = 5 } = req.query;
+  const { limit = 5, order = "ASC", page = 1 } = req.query;
+
+  // Utilizar una expresión regular para verificar si 'page' es un número válido
+  const isPageValid = /^[1-9]\d*$/.test(page);
+
+  // Validar el resultado de la expresión regular
+  if (!isPageValid) {
+    return res.status(400).json({ message: "Invalid page number, number > 0" });
+  }
 
   try {
-    const todos = await todoModel.findAll({ limit });
+    const todos = await todoModel.findAll({ limit, order, page });
     return res.json(todos);
   } catch (error) {
     console.log(error);
