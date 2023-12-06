@@ -1,11 +1,20 @@
-import pkg from "pg";
 import "dotenv/config";
+import pkg from "pg";
 const { Pool } = pkg;
 
-// cambia los datos de acuerdo a tu configuracion de postgres
-export const pool = new Pool({
-  allowExitOnIdle: true,
-});
+const connectionString = process.env.PG_STRING_URL;
+
+export const pool = connectionString
+  ? new Pool({
+      connectionString,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+      allowExitOnIdle: true,
+    })
+  : new Pool({
+      allowExitOnIdle: true,
+    });
 
 try {
   await pool.query("SELECT NOW()");
